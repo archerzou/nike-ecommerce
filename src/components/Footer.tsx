@@ -50,7 +50,7 @@ const defaultGroups: FooterLinkGroup[] = [
 export default function Footer({ groups = defaultGroups, className }: FooterProps) {
   return (
     <footer
-      className={["w-full bg-[var(--color-dark-900)] text-[var(--color-light-100)]", className].filter(Boolean).join(" ")}
+      className={["w-full bg-black text-[var(--color-light-100)]", className].filter(Boolean).join(" ")}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-5">

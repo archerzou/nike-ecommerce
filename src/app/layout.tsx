@@ -9,7 +9,6 @@ const jost = Jost({
   subsets: ["latin"],
 });
 
-
 export const metadata: Metadata = {
   title: "Nike",
   description: "An e-commerce platform for Nike shoes",
@@ -22,11 +21,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${jost.className} antialiased`}
-      >
+      <body className={`${jost.className} antialiased`}>
         <Navbar />
-         {children}
+        {children}
         <Footer />
       </body>
     </html>
