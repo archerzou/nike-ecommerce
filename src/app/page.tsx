@@ -15,7 +15,7 @@ const products: DummyProduct[] = [
   {
     id: '1',
     name: "Nike Air Force 1 Mid '07",
-    image: '/shoes/air-force-1.png',
+    image: '/shoes/shoe-1.jpg',
     price: 98.3,
     subtitle: "Men's Shoes",
     colors: 6,
@@ -24,7 +24,7 @@ const products: DummyProduct[] = [
   {
     id: '2',
     name: 'Nike Air Max 90',
-    image: '/shoes/air-max-90.png',
+    image: '/shoes/shoe-3.webp',
     price: 120,
     subtitle: "Men's Shoes",
     colors: 4,
@@ -32,7 +32,7 @@ const products: DummyProduct[] = [
   {
     id: '3',
     name: 'Nike Dunk Low Retro',
-    image: '/shoes/dunk-low.png',
+    image: '/shoes/shoe-4.webp',
     price: 115,
     subtitle: "Men's Shoes",
     colors: 5,
@@ -40,7 +40,7 @@ const products: DummyProduct[] = [
   {
     id: '4',
     name: 'Nike Pegasus 41',
-    image: '/shoes/pegasus.png',
+    image: '/shoes/shoe-6.avif',
     price: 130,
     subtitle: "Men's Shoes",
     colors: 3,
@@ -63,7 +63,7 @@ const Home = () => {
               subtitle={p.subtitle}
               price={p.price}
               colorCount={p.colors}
-              badge={p.badge ? { text: p.badge.text, tone: p.badge.tone as any } : undefined}
+              badge={p.badge ? { text: p.badge.text, tone: p.badge.tone } : undefined}
               href="#"
             />
           ))}
