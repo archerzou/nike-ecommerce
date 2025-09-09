@@ -38,19 +38,10 @@ export default function Card({
   href,
   className,
 }: CardProps) {
-  const Comp: React.ElementType = href ? Link : "div";
   const priceText = typeof price === "number" ? `$${price.toFixed(2)}` : price;
 
-  return (
-    <Comp
-      href={href ?? "#"}
-      className={[
-        "group block overflow-hidden rounded-lg bg-[var(--color-light-100)] ring-1 ring-[var(--color-light-300)] shadow-sm hover:shadow-md transition",
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
-    >
+  const content = (
+    <>
       <div className="relative aspect-[16/10] w-full bg-[var(--color-light-200)]">
         <Image src={imageSrc} alt={imageAlt} fill sizes="(min-width: 1024px) 25vw, 100vw" className="object-cover" />
         {badge?.text ? (
@@ -83,6 +74,23 @@ export default function Card({
           {priceText ? <div className="shrink-0 text-[var(--text-heading-3)]">{priceText}</div> : null}
         </div>
       </div>
-    </Comp>
+    </>
   );
+
+  const classes = [
+    "group block overflow-hidden rounded-lg bg-[var(--color-light-100)] ring-1 ring-[var(--color-light-300)] shadow-sm hover:shadow-md transition",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  if (href) {
+    return (
+      <Link href={href} className={classes}>
+        {content}
+      </Link>
+    );
+  }
+
+  return <div className={classes}>{content}</div>;
 }
