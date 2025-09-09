@@ -1,120 +1,88 @@
 "use client";
-import React from "react";
-
 
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
-export interface NavLink {
-  label: string;
-  href?: string;
-}
+const NAV_LINKS = [
+  { label: "Men", href: "/products?gender=men" },
+  { label: "Women", href: "/products?gender=women" },
+  { label: "Kids", href: "/products?gender=unisex" },
+  { label: "Collections", href: "/collections" },
+  { label: "Contact", href: "/contact" },
+] as const;
 
-export interface NavbarProps {
-  links?: NavLink[];
-  cartCount?: number;
-  className?: string;
-  onToggleMenu?: (open: boolean) => void;
-}
-
-const defaultLinks: NavLink[] = [
-  { label: "Men", href: "#" },
-  { label: "Women", href: "#" },
-  { label: "Kids", href: "#" },
-  { label: "Collections", href: "#" },
-  { label: "Contact", href: "#" },
-];
-
-export default function Navbar({
-  links = defaultLinks,
-  cartCount = 0,
-  className,
-  onToggleMenu,
-}: NavbarProps) {
+export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const toggle = () => {
-    const v = !open;
-    setOpen(v);
-    onToggleMenu?.(v);
-  };
 
   return (
-    <header className={["w-full bg-[var(--color-light-100)]", className].filter(Boolean).join(" ")}>
-      <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Primary">
-        <div className="flex h-16 items-center justify-between">
-          <Link href="#" className="flex items-center gap-2">
-            <Image src="/logo.svg" alt="Nike Logo" width={28} height={28} priority />
+      <header className="sticky top-0 z-50 bg-light-100">
+        <nav
+            className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8"
+            aria-label="Primary"
+        >
+          <Link href="/" aria-label="Nike Home" className="flex items-center">
+            <Image src="/logo.svg" alt="Nike" width={28} height={28} priority className="invert" />
           </Link>
 
-          <ul className="hidden md:flex items-center gap-8">
-            {links.map((l) => (
-              <li key={l.label}>
-                <Link
-                  className="text-[var(--color-dark-900)] text-[var(--text-body)] hover:text-[var(--color-dark-700)]"
-                  href={l.href ?? "#"}
-                >
-                  {l.label}
-                </Link>
-              </li>
+          <ul className="hidden items-center gap-8 md:flex">
+            {NAV_LINKS.map((l) => (
+                <li key={l.href}>
+                  <Link
+                      href={l.href}
+                      className="text-body text-dark-900 transition-colors hover:text-dark-700"
+                  >
+                    {l.label}
+                  </Link>
+                </li>
             ))}
           </ul>
 
-          <div className="hidden md:flex items-center gap-8">
-            <button
-              className="text-[var(--color-dark-900)] text-[var(--text-body)] hover:text-[var(--color-dark-700)] focus:outline-none focus:ring-2 focus:ring-[var(--color-dark-900)] rounded"
-              type="button"
-            >
+          <div className="hidden items-center gap-6 md:flex">
+            <button className="text-body text-dark-900 transition-colors hover:text-dark-700">
               Search
             </button>
-            <Link
-              href="#"
-              className="text-[var(--color-dark-900)] text-[var(--text-body)] hover:text-[var(--color-dark-700)]"
-            >
-              {"My Cart" + (cartCount ? ` (${cartCount})` : "")}
-            </Link>
+            <button className="text-body text-dark-900 transition-colors hover:text-dark-700">
+              My Cart (2)
+            </button>
           </div>
 
           <button
-            type="button"
-            className="md:hidden inline-flex items-center justify-center rounded-md p-2 text-[var(--color-dark-900)] hover:bg-[var(--color-light-200)] focus:outline-none focus:ring-2 focus:ring-[var(--color-dark-900)]"
-            aria-controls="mobile-menu"
-            aria-expanded={open}
-            onClick={toggle}
+              type="button"
+              className="inline-flex items-center justify-center rounded-md p-2 md:hidden"
+              aria-controls="mobile-menu"
+              aria-expanded={open}
+              onClick={() => setOpen((v) => !v)}
           >
-            <span className="sr-only">Toggle main menu</span>
-            <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path strokeWidth="2" strokeLinecap="round" d={open ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
-            </svg>
+            <span className="sr-only">Toggle navigation</span>
+            <span className="mb-1 block h-0.5 w-6 bg-dark-900"></span>
+            <span className="mb-1 block h-0.5 w-6 bg-dark-900"></span>
+            <span className="block h-0.5 w-6 bg-dark-900"></span>
           </button>
-        </div>
+        </nav>
 
-        <div id="mobile-menu" className={`md:hidden ${open ? "block" : "hidden"} pb-4`}>
-          <ul className="space-y-2">
-            {links.map((l) => (
-              <li key={l.label}>
-                <Link
-                  className="block rounded-md px-3 py-2 text-[var(--color-dark-900)] hover:bg-[var(--color-light-200)]"
-                  href={l.href ?? "#"}
-                >
-                  {l.label}
-                </Link>
-              </li>
+        <div
+            id="mobile-menu"
+            className={`border-t border-light-300 md:hidden ${open ? "block" : "hidden"}`}
+        >
+          <ul className="space-y-2 px-4 py-3">
+            {NAV_LINKS.map((l) => (
+                <li key={l.href}>
+                  <Link
+                      href={l.href}
+                      className="block py-2 text-body text-dark-900 hover:text-dark-700"
+                      onClick={() => setOpen(false)}
+                  >
+                    {l.label}
+                  </Link>
+                </li>
             ))}
-            <li className="mt-2 border-t border-[var(--color-light-300)] pt-2">
-              <button className="block w-full text-left rounded-md px-3 py-2 text-[var(--color-dark-900)] hover:bg-[var(--color-light-200)]">
-                Search
-              </button>
-              <Link
-                href="#"
-                className="mt-1 block rounded-md px-3 py-2 text-[var(--color-dark-900)] hover:bg-[var(--color-light-200)]"
-              >
-                {"My Cart" + (cartCount ? ` (${cartCount})` : "")}
-              </Link>
+            <li className="flex items-center justify-between pt-2">
+              <button className="text-body">Search</button>
+              <button className="text-body">My Cart (2)</button>
             </li>
           </ul>
         </div>
-      </nav>
-    </header>
+      </header>
   );
 }

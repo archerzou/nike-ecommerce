@@ -1,75 +1,68 @@
-import React from 'react';
-import Card from '@/components/Card';
+import React from "react";
+import { Card } from "@/components";
 
-type DummyProduct = {
-  id: string;
-  name: string;
-  image: string;
-  price: number;
-  subtitle?: string;
-  colors?: number;
-  badge?: { text: string; tone?: 'orange' | 'red' | 'green' | 'dark' };
-};
-
-const products: DummyProduct[] = [
+const products = [
   {
-    id: '1',
-    name: "Nike Air Force 1 Mid '07",
-    image: '/shoes/shoe-1.jpg',
-    price: 98.3,
+    id: 1,
+    title: "Air Max Pulse",
     subtitle: "Men's Shoes",
-    colors: 6,
-    badge: { text: 'Best Seller', tone: 'orange' },
+    meta: "6 Colour",
+    price: 149.99,
+    imageSrc: "/shoes/shoe-1.jpg",
+    badge: { label: "New", tone: "orange" as const },
   },
   {
-    id: '2',
-    name: 'Nike Air Max 90',
-    image: '/shoes/shoe-3.webp',
-    price: 120,
+    id: 2,
+    title: "Air Zoom Pegasus",
     subtitle: "Men's Shoes",
-    colors: 4,
+    meta: "4 Colour",
+    price: 129.99,
+    imageSrc: "/shoes/shoe-2.webp",
+    badge: { label: "Hot", tone: "red" as const },
   },
   {
-    id: '3',
-    name: 'Nike Dunk Low Retro',
-    image: '/shoes/shoe-4.webp',
-    price: 115,
+    id: 3,
+    title: "InfinityRN 4",
     subtitle: "Men's Shoes",
-    colors: 5,
+    meta: "6 Colour",
+    price: 159.99,
+    imageSrc: "/shoes/shoe-3.webp",
+    badge: { label: "Trending", tone: "green" as const },
   },
   {
-    id: '4',
-    name: 'Nike Pegasus 41',
-    image: '/shoes/shoe-6.avif',
-    price: 130,
+    id: 4,
+    title: "Metcon 9",
     subtitle: "Men's Shoes",
-    colors: 3,
+    meta: "3 Colour",
+    price: 139.99,
+    imageSrc: "/shoes/shoe-4.webp",
   },
 ];
 
-const Home = () => {
-  return (
-    <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-[var(--text-heading-1)] font-medium mb-8">Nike</h1>
+const Home = async () => {
 
-      <section aria-label="Featured Products">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {products.map((p) => (
-            <Card
-              key={p.id}
-              imageSrc={p.image}
-              imageAlt={p.name}
-              title={p.name}
-              subtitle={p.subtitle}
-              price={p.price}
-              colorCount={p.colors}
-              badge={p.badge ? { text: p.badge.text, tone: p.badge.tone } : undefined}
-              href="#"
-            />
-          ))}
-        </div>
-      </section>
-    </main>
+  return (
+      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section aria-labelledby="latest" className="pb-12">
+          <h2 id="latest" className="mb-6 text-heading-3 text-dark-900">
+            Latest shoes
+          </h2>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {products.map((p) => (
+                <Card
+                    key={p.id}
+                    title={p.title}
+                    subtitle={p.subtitle}
+                    meta={p.meta}
+                    imageSrc={p.imageSrc}
+                    price={p.price}
+                    badge={p.badge}
+                    href={`/products/${p.id}`}
+                />
+            ))}
+          </div>
+        </section>
+      </main>
   );
 };
 

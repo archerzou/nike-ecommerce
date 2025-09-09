@@ -1,96 +1,72 @@
-import React from "react";
-
 import Image from "next/image";
 import Link from "next/link";
 
-export interface CardBadge {
-  text: string;
-  tone?: "red" | "green" | "orange" | "dark";
-}
+export type BadgeTone = "red" | "green" | "orange";
 
 export interface CardProps {
+  title: string;
+  description?: string;
+  subtitle?: string;
+  meta?: string | string[];
   imageSrc: string;
   imageAlt?: string;
-  title: string;
-  subtitle?: string;
   price?: string | number;
-  badge?: CardBadge;
-  colorCount?: number;
   href?: string;
+  badge?: { label: string; tone?: BadgeTone };
   className?: string;
 }
 
-function badgeToneClass(tone?: CardBadge["tone"]) {
-  if (tone === "red") return "text-[var(--color-red)]";
-  if (tone === "green") return "text-[var(--color-green)]";
-  if (tone === "orange") return "text-[var(--color-orange)]";
-  return "text-[var(--color-dark-900)]";
-}
-
 export default function Card({
-  imageSrc,
-  imageAlt,
-  title,
-  subtitle,
-  price,
-  badge,
-  colorCount,
-  href,
-  className,
-}: CardProps) {
-  const priceText = typeof price === "number" ? `$${price.toFixed(2)}` : price;
-
+                               title,
+                               description,
+                               subtitle,
+                               meta,
+                               imageSrc,
+                               imageAlt = title,
+                               price,
+                               href,
+                               className = "",
+                             }: CardProps) {
+  const displayPrice =
+      price === undefined ? undefined : typeof price === "number" ? `$${price.toFixed(2)}` : price;
   const content = (
-    <>
-      <div className="relative aspect-[16/10] w-full bg-[var(--color-light-200)]">
-        <Image src={imageSrc} alt="" fill sizes="(min-width: 1024px) 25vw, 100vw" className="object-cover" />
-        {badge?.text ? (
-          <span
-            className={[
-              "absolute left-4 top-4 rounded-full px-3 py-1 text-[var(--text-body)] font-medium bg-[var(--color-light-100)]/90",
-              badgeToneClass(badge.tone),
-            ].join(" ")}
-          >
-            {badge.text}
-          </span>
-        ) : null}
-      </div>
-
-      <div className="bg-[var(--color-dark-900)] text-[var(--color-light-100)] px-4 py-3">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h3 className="text-[var(--text-heading-3)] leading-[var(--text-heading-3--line-height)] font-medium">
-              {title}
-            </h3>
-            {subtitle ? (
-              <p className="mt-1 text-[var(--text-body)] text-[var(--color-light-400)]">{subtitle}</p>
-            ) : null}
-            {typeof colorCount === "number" ? (
-              <p className="mt-1 text-[var(--text-caption)] text-[var(--color-light-400)]">
-                {colorCount} Colour
-              </p>
-            ) : null}
-          </div>
-          {priceText ? <div className="shrink-0 text-[var(--text-heading-3)]">{priceText}</div> : null}
+      <article
+          className={`group rounded-xl bg-light-100 ring-1 ring-light-300 transition-colors hover:ring-dark-500 ${className}`}
+      >
+        <div className="relative aspect-square overflow-hidden rounded-t-xl bg-light-200">
+          <Image
+              src={imageSrc}
+              alt={imageAlt}
+              fill
+              sizes="(min-width: 1280px) 360px, (min-width: 1024px) 300px, (min-width: 640px) 45vw, 90vw"
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+          />
         </div>
-      </div>
-    </>
+        <div className="p-4">
+          <div className="mb-1 flex items-baseline justify-between gap-3">
+            <h3 className="text-heading-3 text-dark-900">{title}</h3>
+            {displayPrice && <span className="text-body-medium text-dark-900">{displayPrice}</span>}
+          </div>
+          {description && <p className="text-body text-dark-700">{description}</p>}
+          {subtitle && <p className="text-body text-dark-700">{subtitle}</p>}
+          {meta && (
+              <p className="mt-1 text-caption text-dark-700">
+                {Array.isArray(meta) ? meta.join(" • ") : meta}
+              </p>
+          )}
+        </div>
+      </article>
   );
 
-  const classes = [
-    "group block overflow-hidden rounded-lg bg-[var(--color-light-100)] ring-1 ring-[var(--color-light-300)] shadow-sm hover:shadow-md transition",
-    className,
-  ]
-    .filter(Boolean)
-    .join(" ");
-
-  if (href) {
-    return (
-      <Link href={href} className={classes}>
+  return href ? (
+      <Link
+          href={href}
+          aria-label={title}
+          className="block rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[--color-dark-500]"
+      >
         {content}
       </Link>
-    );
-  }
-
-  return <div className={classes}>{content}</div>;
+  ) : (
+      content
+  );
 }
