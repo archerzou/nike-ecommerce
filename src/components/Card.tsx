@@ -10,7 +10,7 @@ export interface CardBadge {
 
 export interface CardProps {
   imageSrc: string;
-  imageAlt: string;
+  imageAlt?: string;
   title: string;
   subtitle?: string;
   price?: string | number;
@@ -43,7 +43,7 @@ export default function Card({
   const content = (
     <>
       <div className="relative aspect-[16/10] w-full bg-[var(--color-light-200)]">
-        <Image src={imageSrc} alt={imageAlt} fill sizes="(min-width: 1024px) 25vw, 100vw" className="object-cover" />
+        <Image src={imageSrc} alt="" fill sizes="(min-width: 1024px) 25vw, 100vw" className="object-cover" />
         {badge?.text ? (
           <span
             className={[
