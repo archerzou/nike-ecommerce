@@ -55,7 +55,7 @@ function buildWhere(filters: NormalizedProductFilters) {
       or(
         ilike(products.name, `%${search}%`),
         ilike(products.description, `%${search}%`)
-      )
+      ) as unknown as SQLWrapper
     );
   }
 
@@ -68,18 +68,18 @@ function buildWhere(filters: NormalizedProductFilters) {
 
   const priceExpr = sql`COALESCE(${productVariants.salePrice}, ${productVariants.price})::numeric`;
   const priceConds: SQLWrapper[] = [];
-  if (priceMin !== undefined) priceConds.push(sql`${priceExpr} >= ${priceMin}`);
-  if (priceMax !== undefined) priceConds.push(sql`${priceExpr} <= ${priceMax}`);
+  if (priceMin !== undefined) priceConds.push(sql`${priceExpr} >= ${priceMin}` as unknown as SQLWrapper);
+  if (priceMax !== undefined) priceConds.push(sql`${priceExpr} <= ${priceMax}` as unknown as SQLWrapper);
   for (const [min, max] of priceRanges) {
     if (min !== undefined && max !== undefined) {
-      priceConds.push(sql`(${priceExpr} BETWEEN ${min} AND ${max})`);
+      priceConds.push(sql`(${priceExpr} BETWEEN ${min} AND ${max})` as unknown as SQLWrapper);
     } else if (min !== undefined) {
-      priceConds.push(sql`${priceExpr} >= ${min}`);
+      priceConds.push(sql`${priceExpr} >= ${min}` as unknown as SQLWrapper);
     } else if (max !== undefined) {
-      priceConds.push(sql`${priceExpr} <= ${max}`);
+      priceConds.push(sql`${priceExpr} <= ${max}` as unknown as SQLWrapper);
     }
   }
-  if (priceConds.length) conds.push(or(...priceConds));
+  if (priceConds.length) conds.push(or(...priceConds) as unknown as SQLWrapper);
 
   return and(...conds);
 }
