@@ -47,7 +47,7 @@ function buildWhere(filters: NormalizedProductFilters) {
     priceRanges,
   } = filters;
 
-  const conds: any[] = [eq(products.isPublished, true)];
+  const conds: unknown[] = [eq(products.isPublished, true)];
 
   if (search) {
     conds.push(
@@ -66,7 +66,7 @@ function buildWhere(filters: NormalizedProductFilters) {
   if (sizeSlugs.length) conds.push(inArray(sizes.slug, sizeSlugs));
 
   const priceExpr = sql`COALESCE(${productVariants.salePrice}, ${productVariants.price})::numeric`;
-  const priceConds: any[] = [];
+  const priceConds: unknown[] = [];
   if (priceMin !== undefined) priceConds.push(sql`${priceExpr} >= ${priceMin}`);
   if (priceMax !== undefined) priceConds.push(sql`${priceExpr} <= ${priceMax}`);
   for (const [min, max] of priceRanges) {
@@ -218,7 +218,7 @@ export async function getProduct(productId: string): Promise<FullProduct | null>
         CASE WHEN ${genders.id} IS NULL THEN NULL
         ELSE json_build_object('id', ${genders.id}, 'label', ${genders.label}, 'slug', ${genders.slug}) END
       `,
-      variants: sql<any[]>`
+      variants: sql<unknown[]>`
         COALESCE(
           json_agg(
             DISTINCT jsonb_build_object(
