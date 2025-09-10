@@ -1,5 +1,6 @@
 import React from "react";
 import { Card } from "@/components";
+import {getCurrentUser} from "@/lib/auth/actions";
 
 const products = [
   {
@@ -40,6 +41,8 @@ const products = [
 ];
 
 const Home = async () => {
+  const user = await getCurrentUser();
+
   return (
     <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <section aria-labelledby="latest" className="pb-12">

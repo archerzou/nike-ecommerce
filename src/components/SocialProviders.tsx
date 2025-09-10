@@ -1,31 +1,26 @@
-'use client'
-import React from 'react'
-import Image from 'next/image'
+import Image from "next/image";
 
-type SocialProvidersProps = { label?: string; mode: 'signin' | 'signup' }
+type Props = { variant?: "sign-in" | "sign-up" };
 
-const providers = [
-  { name: 'Google', src: '/next.svg', alt: 'Google' },
-  { name: 'Apple', src: '/file.svg', alt: 'Apple' },
-]
-
-export default function SocialProviders({ label = 'Continue with' }: SocialProvidersProps) {
-  const action = label
+export default function SocialProviders({ variant = "sign-in" }: Props) {
   return (
-    <div className="space-y-3">
-      {providers.map((p) => (
+      <div className="space-y-3">
         <button
-          key={p.name}
-          type="button"
-          className="w-full inline-flex items-center justify-center gap-3 rounded-xl border border-dark-300 px-4 py-3 text-sm font-medium hover:bg-light-200 transition-colors"
-          aria-label={`${action} ${p.name}`}
+            type="button"
+            className="flex w-full items-center justify-center gap-3 rounded-xl border border-light-300 bg-light-100 px-4 py-3 text-body-medium text-dark-900 hover:bg-light-200 focus:outline-none focus:ring-2 focus:ring-dark-900/10"
+            aria-label={`${variant === "sign-in" ? "Continue" : "Sign up"} with Google`}
         >
-          <Image src={p.src} alt={p.alt} width={18} height={18} />
-          <span>
-            {action} {p.name}
-          </span>
+          <Image src="/google.svg" alt="" width={18} height={18} />
+          <span>Continue with Google</span>
         </button>
-      ))}
-    </div>
-  )
+        <button
+            type="button"
+            className="flex w-full items-center justify-center gap-3 rounded-xl border border-light-300 bg-light-100 px-4 py-3 text-body-medium text-dark-900 hover:bg-light-200 focus:outline-none focus:ring-2 focus:ring-dark-900/10"
+            aria-label={`${variant === "sign-in" ? "Continue" : "Sign up"} with Apple`}
+        >
+          <Image src="/apple.svg" alt="" width={18} height={18} />
+          <span>Continue with Apple</span>
+        </button>
+      </div>
+  );
 }
