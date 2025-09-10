@@ -1,76 +1,44 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { useUpdateUrlParams } from '@/lib/utils/client-query';
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { setParam } from "@/lib/utils/query";
+import { useMemo } from "react";
 
-interface SortProps {
-  currentSort?: string;
-}
+const OPTIONS = [
+  { label: "Featured", value: "featured" },
+  { label: "Newest", value: "newest" },
+  { label: "Price (High → Low)", value: "price_desc" },
+  { label: "Price (Low → High)", value: "price_asc" },
+] as const;
 
-const sortOptions = [
-  { value: 'featured', label: 'Featured' },
-  { value: 'newest', label: 'Newest' },
-  { value: 'price_desc', label: 'Price: High to Low' },
-  { value: 'price_asc', label: 'Price: Low to High' },
-];
+export default function Sort() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const search = useMemo(() => `?${searchParams.toString()}`, [searchParams]);
+  const selected = searchParams.get("sort") ?? "featured";
 
-export function Sort({ currentSort = 'featured' }: SortProps) {
-  const updateUrlParams = useUpdateUrlParams();
-  const [isOpen, setIsOpen] = useState(false);
-
-  const handleSortChange = (sortValue: string) => {
-    updateUrlParams({
-      sort: sortValue === 'featured' ? undefined : sortValue,
-    });
-    setIsOpen(false);
+  const onChange = (value: string) => {
+    const withSort = setParam(pathname, search, "sort", value);
+    const withPageReset = setParam(pathname, new URL(withSort, "http://dummy").search, "page", "1");
+    router.push(withPageReset, { scroll: false });
   };
 
-  const currentSortLabel = sortOptions.find(option => option.value === currentSort)?.label || 'Featured';
-
   return (
-    <div className="relative">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 bg-light-100 border border-light-300 rounded-md text-body-medium text-dark-900 hover:bg-light-200 focus:ring-2 focus:ring-dark-500 focus:border-transparent"
-        aria-expanded={isOpen}
-        aria-haspopup="listbox"
-      >
-        <span>Sort By: {currentSortLabel}</span>
-        <span className={`transform transition-transform ${isOpen ? 'rotate-180' : ''}`}>
-          ▼
-        </span>
-      </button>
-
-      {isOpen && (
-        <>
-          {/* Overlay for mobile */}
-          <div 
-            className="fixed inset-0 z-10 lg:hidden"
-            onClick={() => setIsOpen(false)}
-          />
-          
-          {/* Dropdown */}
-          <div className="absolute right-0 top-full mt-1 w-48 bg-light-100 border border-light-300 rounded-md shadow-lg z-20">
-            <div className="py-1" role="listbox">
-              {sortOptions.map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => handleSortChange(option.value)}
-                  className={`w-full px-4 py-2 text-left text-body hover:bg-light-200 focus:bg-light-200 focus:outline-none ${
-                    currentSort === option.value 
-                      ? 'text-dark-900 font-medium' 
-                      : 'text-dark-700'
-                  }`}
-                  role="option"
-                  aria-selected={currentSort === option.value}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
-    </div>
+      <label className="inline-flex items-center gap-2">
+        <span className="text-body text-dark-900">Sort by</span>
+        <select
+            className="rounded-md border border-light-300 bg-light-100 px-3 py-2 text-body"
+            value={selected}
+            onChange={(e) => onChange(e.target.value)}
+            aria-label="Sort products"
+        >
+          {OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+          ))}
+        </select>
+      </label>
   );
 }
