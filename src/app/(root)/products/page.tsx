@@ -162,14 +162,14 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   )).map(slug => {
     const color = mockProducts.flatMap(p => p.variants).find(v => v.color.slug === slug)?.color;
     return color ? { slug: color.slug, name: color.name, hexCode: color.hexCode } : null;
-  }).filter(Boolean);
+  }).filter((option): option is { slug: string; name: string; hexCode: string } => option !== null);
   
   const sizeOptions = Array.from(new Set(
     mockProducts.flatMap(p => p.variants.map(v => v.size.slug))
   )).map(slug => {
     const size = mockProducts.flatMap(p => p.variants).find(v => v.size.slug === slug)?.size;
     return size ? { slug: size.slug, name: size.name } : null;
-  }).filter(Boolean);
+  }).filter((option): option is { slug: string; name: string } => option !== null);
 
   return (
     <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
