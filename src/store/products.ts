@@ -9,7 +9,7 @@ interface ProductStore {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   addProduct: (product: Product) => void;
-  removeProduct: (id: number) => void;
+  removeProduct: (id: string) => void;
 }
 
 export const useProductStore = create<ProductStore>((set) => ({
