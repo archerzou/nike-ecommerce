@@ -1,20 +1,26 @@
-import { pgTable, text, uuid, integer } from 'drizzle-orm/pg-core';
+import { pgTable, text, integer, uuid } from 'drizzle-orm/pg-core';
 import { z } from 'zod';
+import { relations } from 'drizzle-orm';
+import { productVariants } from '../variants';
 
 export const sizes = pgTable('sizes', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
   slug: text('slug').notNull().unique(),
-  sortOrder: integer('sort_order').notNull().default(0),
+  sortOrder: integer('sort_order').notNull(),
 });
 
-export const sizeInsertSchema = z.object({
-  id: z.string().uuid().optional(),
+export const sizesRelations = relations(sizes, ({ many }) => ({
+  variants: many(productVariants),
+}));
+
+export const insertSizeSchema = z.object({
   name: z.string().min(1),
   slug: z.string().min(1),
-  sortOrder: z.number().int().min(0).default(0),
+  sortOrder: z.number().int(),
 });
-
-export const sizeSelectSchema = sizeInsertSchema.extend({
+export const selectSizeSchema = insertSizeSchema.extend({
   id: z.string().uuid(),
 });
+export type InsertSize = z.infer<typeof insertSizeSchema>;
+export type SelectSize = z.infer<typeof selectSizeSchema>;

@@ -1,17 +1,19 @@
-import { pgTable, uuid, integer, text, timestamp } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
-import { user } from './user';
-import { products } from './products';
+import { pgTable, text, timestamp, uuid, integer } from 'drizzle-orm/pg-core';
+import { relations, sql } from 'drizzle-orm';
 import { z } from 'zod';
+import { products } from './products';
+import { user } from './user';
 
 export const reviews = pgTable('reviews', {
   id: uuid('id').primaryKey().defaultRandom(),
-  productId: uuid('product_id').notNull().references(() => products.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
-  userId: uuid('user_id').notNull().references(() => user.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
+  productId: uuid('product_id').references(() => products.id, { onDelete: 'cascade' }).notNull(),
+  userId: uuid('user_id').references(() => user.id, { onDelete: 'cascade' }).notNull(),
   rating: integer('rating').notNull(),
   comment: text('comment'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-});
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (t) => ({
+  ratingRange: sql`CHECK (${t.rating.name} BETWEEN 1 AND 5)`,
+}));
 
 export const reviewsRelations = relations(reviews, ({ one }) => ({
   product: one(products, {
@@ -24,15 +26,15 @@ export const reviewsRelations = relations(reviews, ({ one }) => ({
   }),
 }));
 
-export const reviewInsertSchema = z.object({
-  id: z.string().uuid().optional(),
+export const insertReviewSchema = z.object({
   productId: z.string().uuid(),
   userId: z.string().uuid(),
   rating: z.number().int().min(1).max(5),
   comment: z.string().optional().nullable(),
   createdAt: z.date().optional(),
 });
-
-export const reviewSelectSchema = reviewInsertSchema.extend({
+export const selectReviewSchema = insertReviewSchema.extend({
   id: z.string().uuid(),
 });
+export type InsertReview = z.infer<typeof insertReviewSchema>;
+export type SelectReview = z.infer<typeof selectReviewSchema>;

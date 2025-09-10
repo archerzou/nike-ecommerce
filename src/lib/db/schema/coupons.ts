@@ -8,21 +8,21 @@ export const coupons = pgTable('coupons', {
   code: text('code').notNull().unique(),
   discountType: discountTypeEnum('discount_type').notNull(),
   discountValue: numeric('discount_value').notNull(),
-  expiresAt: timestamp('expires_at', { withTimezone: true }),
+  expiresAt: timestamp('expires_at'),
   maxUsage: integer('max_usage').notNull().default(0),
   usedCount: integer('used_count').notNull().default(0),
 });
 
-export const couponInsertSchema = z.object({
-  id: z.string().uuid().optional(),
+export const insertCouponSchema = z.object({
   code: z.string().min(1),
   discountType: z.enum(['percentage', 'fixed']),
-  discountValue: z.string(),
+  discountValue: z.number(),
   expiresAt: z.date().optional().nullable(),
-  maxUsage: z.number().int().min(0).default(0),
-  usedCount: z.number().int().min(0).default(0),
+  maxUsage: z.number().int().nonnegative().optional(),
+  usedCount: z.number().int().nonnegative().optional(),
 });
-
-export const couponSelectSchema = couponInsertSchema.extend({
+export const selectCouponSchema = insertCouponSchema.extend({
   id: z.string().uuid(),
 });
+export type InsertCoupon = z.infer<typeof insertCouponSchema>;
+export type SelectCoupon = z.infer<typeof selectCouponSchema>;

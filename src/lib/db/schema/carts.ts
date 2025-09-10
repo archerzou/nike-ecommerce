@@ -1,29 +1,33 @@
 import { pgTable, uuid, timestamp, integer } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
+import { z } from 'zod';
 import { user } from './user';
 import { guest } from './guest';
 import { productVariants } from './variants';
-import { z } from 'zod';
 
 export const carts = pgTable('carts', {
   id: uuid('id').primaryKey().defaultRandom(),
-  userId: uuid('user_id').references(() => user.id, { onDelete: 'set null', onUpdate: 'cascade' }),
-  guestId: uuid('guest_id').references(() => guest.id, { onDelete: 'set null', onUpdate: 'cascade' }),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  userId: uuid('user_id').references(() => user.id, { onDelete: 'set null' }),
+  guestId: uuid('guest_id').references(() => guest.id, { onDelete: 'set null' }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
 export const cartItems = pgTable('cart_items', {
   id: uuid('id').primaryKey().defaultRandom(),
-  cartId: uuid('cart_id').notNull().references(() => carts.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
-  productVariantId: uuid('product_variant_id').notNull().references(() => productVariants.id, { onDelete: 'restrict', onUpdate: 'cascade' }),
+  cartId: uuid('cart_id').references(() => carts.id, { onDelete: 'cascade' }).notNull(),
+  productVariantId: uuid('product_variant_id').references(() => productVariants.id, { onDelete: 'restrict' }).notNull(),
   quantity: integer('quantity').notNull().default(1),
 });
 
-export const cartsRelations = relations(carts, ({ one, many }) => ({
+export const cartsRelations = relations(carts, ({ many, one }) => ({
   user: one(user, {
     fields: [carts.userId],
     references: [user.id],
+  }),
+  guest: one(guest, {
+    fields: [carts.guestId],
+    references: [guest.id],
   }),
   items: many(cartItems),
 }));
@@ -39,25 +43,25 @@ export const cartItemsRelations = relations(cartItems, ({ one }) => ({
   }),
 }));
 
-export const cartInsertSchema = z.object({
-  id: z.string().uuid().optional(),
-  userId: z.string().uuid().nullable().optional(),
-  guestId: z.string().uuid().nullable().optional(),
+export const insertCartSchema = z.object({
+  userId: z.string().uuid().optional().nullable(),
+  guestId: z.string().uuid().optional().nullable(),
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
 });
-
-export const cartSelectSchema = cartInsertSchema.extend({
+export const selectCartSchema = insertCartSchema.extend({
   id: z.string().uuid(),
 });
+export type InsertCart = z.infer<typeof insertCartSchema>;
+export type SelectCart = z.infer<typeof selectCartSchema>;
 
-export const cartItemInsertSchema = z.object({
-  id: z.string().uuid().optional(),
+export const insertCartItemSchema = z.object({
   cartId: z.string().uuid(),
   productVariantId: z.string().uuid(),
   quantity: z.number().int().min(1),
 });
-
-export const cartItemSelectSchema = cartItemInsertSchema.extend({
+export const selectCartItemSchema = insertCartItemSchema.extend({
   id: z.string().uuid(),
 });
+export type InsertCartItem = z.infer<typeof insertCartItemSchema>;
+export type SelectCartItem = z.infer<typeof selectCartItemSchema>;
