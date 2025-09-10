@@ -7,8 +7,8 @@ import {
     type InsertProduct, type InsertVariant, type InsertProductImage,
 } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
-import { mkdirSync, existsSync, cpSync } from 'fs';
-import { join, basename } from 'path';
+import { mkdirSync, existsSync, cpSync, readdirSync } from 'fs';
+import { join, basename, extname } from 'path';
 type ProductRow = typeof products.$inferSelect;
 type VariantRow = typeof productVariants.$inferSelect;
 
@@ -117,11 +117,15 @@ async function seed() {
         const sourceDir = join(process.cwd(), 'public', 'shoes');
         const productNames = Array.from({ length: 15 }, (_, i) => `Nike Air Max ${i + 1}`);
 
-        const sourceImages = [
-            'shoe-1.jpg','shoe-2.webp','shoe-3.webp','shoe-4.webp','shoe-5.avif',
-            'shoe-6.avif','shoe-7.avif','shoe-8.avif','shoe-9.avif','shoe-10.avif',
-            'shoe-11.avif','shoe-12.avif','shoe-13.avif','shoe-14.avif','shoe-15.avif',
-        ];
+        const allowedExt = new Set(['.jpg', '.jpeg', '.png', '.webp', '.avif']);
+        const sourceImages = readdirSync(sourceDir, { withFileTypes: true })
+            .filter((d) => d.isFile())
+            .map((d) => d.name)
+            .filter((name) => allowedExt.has(extname(name).toLowerCase()))
+            .sort((a, b) => a.localeCompare(b));
+        if (sourceImages.length < productNames.length) {
+            throw new Error(`[seed] Not enough images in ${sourceDir}; need ${productNames.length}, found ${sourceImages.length}`);
+        }
 
         log('Creating products with variants and images');
         for (let i = 0; i < productNames.length; i++) {
@@ -175,7 +179,7 @@ async function seed() {
                 await db.update(products).set({ defaultVariantId }).where(eq(products.id, insertedProduct.id));
             }
 
-            const pickName = sourceImages[i % sourceImages.length];
+            const pickName = sourceImages[i];
             const src = join(sourceDir, pickName);
             const destName = `${insertedProduct.id}-${basename(pickName)}`;
             const dest = join(uploadsRoot, destName);
