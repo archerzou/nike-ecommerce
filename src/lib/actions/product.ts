@@ -20,6 +20,7 @@ import {
   sql,
   asc,
   desc,
+  type SQLWrapper,
 } from "drizzle-orm";
 import type { NormalizedProductFilters } from "@/lib/utils/query";
 
@@ -47,7 +48,7 @@ function buildWhere(filters: NormalizedProductFilters) {
     priceRanges,
   } = filters;
 
-  const conds: unknown[] = [eq(products.isPublished, true)];
+  const conds: SQLWrapper[] = [eq(products.isPublished, true)];
 
   if (search) {
     conds.push(
@@ -66,7 +67,7 @@ function buildWhere(filters: NormalizedProductFilters) {
   if (sizeSlugs.length) conds.push(inArray(sizes.slug, sizeSlugs));
 
   const priceExpr = sql`COALESCE(${productVariants.salePrice}, ${productVariants.price})::numeric`;
-  const priceConds: unknown[] = [];
+  const priceConds: SQLWrapper[] = [];
   if (priceMin !== undefined) priceConds.push(sql`${priceExpr} >= ${priceMin}`);
   if (priceMax !== undefined) priceConds.push(sql`${priceExpr} <= ${priceMax}`);
   for (const [min, max] of priceRanges) {
@@ -218,7 +219,15 @@ export async function getProduct(productId: string): Promise<FullProduct | null>
         CASE WHEN ${genders.id} IS NULL THEN NULL
         ELSE json_build_object('id', ${genders.id}, 'label', ${genders.label}, 'slug', ${genders.slug}) END
       `,
-      variants: sql<unknown[]>`
+      variants: sql<{
+        id: string;
+        sku: string;
+        price: string;
+        salePrice?: string | null;
+        inStock: number;
+        color: { id: string; name: string; slug: string; hexCode: string };
+        size: { id: string; slug: string };
+      }[]>`
         COALESCE(
           json_agg(
             DISTINCT jsonb_build_object(
