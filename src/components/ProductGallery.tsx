@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useState, useCallback } from "react";
 import Image from "next/image";
 import { Check, ChevronLeft, ChevronRight, ImageOff } from "lucide-react";
 
@@ -55,8 +55,12 @@ function View() {
   const hasImages = allImages.length > 0;
   const current = hasImages ? allImages[Math.min(imageIndex, allImages.length - 1)] : null;
 
-  const onPrev = () => setImageIndex((i) => (i - 1 + allImages.length) % allImages.length);
-  const onNext = () => setImageIndex((i) => (i + 1) % allImages.length);
+  const onPrev = useCallback(() => {
+    setImageIndex((i) => (i - 1 + allImages.length) % allImages.length);
+  }, [allImages.length]);
+  const onNext = useCallback(() => {
+    setImageIndex((i) => (i + 1) % allImages.length);
+  }, [allImages.length]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -66,7 +70,7 @@ function View() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [hasImages, allImages.length]);
+  }, [hasImages, allImages.length, onPrev, onNext]);
 
   return (
     <div className="grid grid-cols-[72px_1fr] gap-4 lg:grid-cols-[96px_1fr]">
