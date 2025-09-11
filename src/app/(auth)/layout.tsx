@@ -1,35 +1,33 @@
-import Image from 'next/image'
-import Link from 'next/link'
-import '../globals.css'
+import Image from "next/image";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
-      <aside className="relative hidden md:block bg-black text-white">
-        <div className="absolute top-6 left-6 flex items-center gap-2">
-          <Image src="/logo.svg" alt="Brand" width={32} height={32} priority />
-        </div>
-        <div className="h-full flex items-end p-10">
-          <div>
-            <h2 className="text-4xl font-semibold tracking-tight mb-3">Just Do It</h2>
-            <p className="text-white/80 max-w-md">
+      <main className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
+        <section className="hidden lg:flex flex-col justify-between bg-dark-900 text-light-100 p-10">
+          <div className="flex items-center">
+            <div className="h-8 w-8 rounded-md bg-orange inline-flex items-center justify-center">
+              <Image src="/logo.svg" alt="Nike" width={20} height={20} />
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h2 className="text-heading-2">Just Do It</h2>
+            <p className="max-w-md text-lead text-light-300">
               Join millions of athletes and fitness enthusiasts who trust Nike for their performance needs.
             </p>
+            <div className="flex gap-2" aria-hidden="true">
+              <span className="h-2 w-2 rounded-full bg-light-100/90" />
+              <span className="h-2 w-2 rounded-full bg-light-100/50" />
+              <span className="h-2 w-2 rounded-full bg-light-100/50" />
+            </div>
           </div>
-        </div>
-      </aside>
 
-      <main className="bg-white dark:bg-background flex items-center justify-center p-6 sm:p-10">
-        <div className="w-full max-w-md">
-          <p className="text-center text-sm text-muted-foreground">
-            Already have an account?{' '}
-            <Link href="/sign-in" className="font-medium underline underline-offset-4 hover:text-foreground">
-              Sign In
-            </Link>
-          </p>
-          <div className="mt-6">{children}</div>
-        </div>
+          <p className="text-footnote text-light-400">© 2025 Nike. All rights reserved.</p>
+        </section>
+
+        <section className="flex items-center justify-center px-4 py-10 sm:px-6 lg:px-8">
+          <div className="w-full max-w-md">{children}</div>
+        </section>
       </main>
-    </div>
-  )
+  );
 }

@@ -50,30 +50,30 @@ export async function getAllProducts(filters: NormalizedProductFilters): Promise
         conds.push(or(ilike(products.name, pattern), ilike(products.description, pattern))!);
     }
 
-    if (filters.genderSlugs.length) {
+    if (filters.genderSlugs?.length) {
         conds.push(inArray(genders.slug, filters.genderSlugs));
     }
 
-    if (filters.brandSlugs.length) {
+    if (filters.brandSlugs?.length) {
         conds.push(inArray(brands.slug, filters.brandSlugs));
     }
 
-    if (filters.categorySlugs.length) {
+    if (filters.categorySlugs?.length) {
         conds.push(inArray(categories.slug, filters.categorySlugs));
     }
 
-    const hasSize = filters.sizeSlugs.length > 0;
-    const hasColor = filters.colorSlugs.length > 0;
-    const hasPrice = !!(filters.priceMin !== undefined || filters.priceMax !== undefined || filters.priceRanges.length);
+    const hasSize = filters.sizeSlugs?.length || 0 > 0;
+    const hasColor = filters.colorSlugs?.length || 0 > 0;
+    const hasPrice = !!(filters.priceMin !== undefined || filters.priceMax !== undefined || filters.priceRanges?.length);
 
     const variantConds: SQL[] = [];
-    if (hasSize) {
+    if (hasSize && filters.sizeSlugs?.length) {
         variantConds.push(inArray(productVariants.sizeId, db
             .select({ id: sizes.id })
             .from(sizes)
             .where(inArray(sizes.slug, filters.sizeSlugs))));
     }
-    if (hasColor) {
+    if (hasColor && filters.colorSlugs?.length) {
         variantConds.push(inArray(productVariants.colorId, db
             .select({ id: colors.id })
             .from(colors)
@@ -81,8 +81,8 @@ export async function getAllProducts(filters: NormalizedProductFilters): Promise
     }
     if (hasPrice) {
         const priceBounds: SQL[] = [];
-        if (filters.priceRanges.length) {
-            for (const [min, max] of filters.priceRanges) {
+        if (filters.priceRanges?.length) {
+            for (const [min, max] of filters.priceRanges || 0) {
                 const subConds: SQL[] = [];
                 if (min !== undefined) {
                     subConds.push(sql`(${productVariants.price})::numeric >= ${min}`);
@@ -115,7 +115,7 @@ export async function getAllProducts(filters: NormalizedProductFilters): Promise
         .from(productVariants)
         .where(variantConds.length ? and(...variantConds) : undefined)
         .as("v");
-    const imagesJoin = hasColor
+    const imagesJoin = hasColor && filters.colorSlugs?.length
         ? db
             .select({
                 productId: productImages.productId,
@@ -158,8 +158,8 @@ export async function getAllProducts(filters: NormalizedProductFilters): Promise
                 ? desc(sql`max(${variantJoin.price})`)
                 : desc(products.createdAt);
 
-    const page = Math.max(1, filters.page);
-    const limit = Math.max(1, Math.min(filters.limit, 60));
+    const page = Math.max(1, filters.page || 0);
+    const limit = Math.max(1, Math.min(filters.limit || 0, 60));
     const offset = (page - 1) * limit;
 
     const rows = await db
