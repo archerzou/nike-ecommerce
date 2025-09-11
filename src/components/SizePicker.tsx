@@ -1,28 +1,42 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 
-export default function SizePicker({ sizes }: { sizes: string[] }) {
-  const [active, setActive] = useState<number | null>(null);
+const SIZES = ["5", "5.5", "6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "11.5", "12"];
+
+export interface SizePickerProps {
+  className?: string;
+}
+
+export default function SizePicker({ className = "" }: SizePickerProps) {
+  const [selected, setSelected] = useState<string | null>(null);
 
   return (
-    <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
-      {sizes.map((s, i) => {
-        const selected = active === i;
-        return (
-          <button
-            key={s}
-            type="button"
-            onClick={() => setActive(i)}
-            className={`h-12 rounded-md border px-3 text-body-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-dark-500 ${
-              selected ? "border-dark-900" : "border-light-300"
-            }`}
-            aria-pressed={selected}
-          >
-            {s}
+      <div className={`flex flex-col gap-3 ${className}`}>
+        <div className="flex items-center justify-between">
+          <p className="text-body-medium text-dark-900">Select Size</p>
+          <button className="text-caption text-dark-700 underline-offset-2 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[--color-dark-500]">
+            Size Guide
           </button>
-        );
-      })}
-    </div>
+        </div>
+
+        <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
+          {SIZES.map((s) => {
+            const isActive = selected === s;
+            return (
+                <button
+                    key={s}
+                    onClick={() => setSelected(isActive ? null : s)}
+                    className={`rounded-lg border px-3 py-3 text-center text-body transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[--color-dark-500] ${
+                        isActive ? "border-dark-900 text-dark-900" : "border-light-300 text-dark-700 hover:border-dark-500"
+                    }`}
+                    aria-pressed={isActive}
+                >
+                  {s}
+                </button>
+            );
+          })}
+        </div>
+      </div>
   );
 }
